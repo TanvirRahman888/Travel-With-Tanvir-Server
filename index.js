@@ -53,21 +53,53 @@ async function run() {
         })
 
 
-
+        // Add a Spot
         app.post('/TouristSpot', async (req, res) => {
             const newSpot = req.body;
             console.log(newSpot);
             const result = await spotCollection.insertOne(newSpot);
             res.send(result);
         })
-
-        app.delete('/TouristSpot/:id', async (req, res)=>{
-            const id=req.params.id;
+        // Delete a Spot
+        app.delete('/TouristSpot/:id', async (req, res) => {
+            const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await spotCollection.deleteOne(query);
             res.send(result);
         })
 
+        // Update a Spot
+        app.get('/TouristSpot/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await spotCollection.findOne(query);
+            res.send(result)
+        })
+
+        app.put('/TouristSpot/:id', async (req, res) =>{
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const options={upsert:true};
+            const updatedSpot=req.body;
+            const spot={
+                $set:{
+                    spotName:updatedSpot.spotName,
+                     countryName:updatedSpot.countryName,
+                     location:updatedSpot.location,
+                     cost:updatedSpot.cost,
+                     image:updatedSpot.image,
+                     seasonality:updatedSpot.seasonality,
+                     description:updatedSpot.description,
+                     duration:updatedSpot.duration,
+                     yearlyVisitors:updatedSpot.yearlyVisitors,
+                     authorName:updatedSpot.authorName,
+                     authorEmail:updatedSpot.authorEmail,
+                    
+                }
+            }
+            const result= await spotCollection.updateOne(filter,spot,options );
+            res.send(result)
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
