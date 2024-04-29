@@ -47,9 +47,19 @@ async function run() {
         app.get('/MyList/:email', async (req, res) => {
             const email = req.params.email;
             const query = { authorEmail: email };
-            const cursor = await spotCollection.find(query);
+            const cursor = spotCollection.find(query);
             const myList = await cursor.toArray();
             res.send(myList);
+        })
+
+        // Show Country Spot
+        app.get('/allSpot/:country', async (req, res) => {
+            const country = req.params.country;
+            console.log(country);
+            const query = { countryName: country };
+            const cursor = spotCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
         })
 
 
@@ -76,30 +86,32 @@ async function run() {
             res.send(result)
         })
 
-        app.put('/TouristSpot/:id', async (req, res) =>{
+        app.put('/TouristSpot/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) }
-            const options={upsert:true};
-            const updatedSpot=req.body;
-            const spot={
-                $set:{
-                    spotName:updatedSpot.spotName,
-                     countryName:updatedSpot.countryName,
-                     location:updatedSpot.location,
-                     cost:updatedSpot.cost,
-                     image:updatedSpot.image,
-                     seasonality:updatedSpot.seasonality,
-                     description:updatedSpot.description,
-                     duration:updatedSpot.duration,
-                     yearlyVisitors:updatedSpot.yearlyVisitors,
-                     authorName:updatedSpot.authorName,
-                     authorEmail:updatedSpot.authorEmail,
-                    
+            const options = { upsert: true };
+            const updatedSpot = req.body;
+            const spot = {
+                $set: {
+                    spotName: updatedSpot.spotName,
+                    countryName: updatedSpot.countryName,
+                    location: updatedSpot.location,
+                    cost: updatedSpot.cost,
+                    image: updatedSpot.image,
+                    seasonality: updatedSpot.seasonality,
+                    description: updatedSpot.description,
+                    duration: updatedSpot.duration,
+                    yearlyVisitors: updatedSpot.yearlyVisitors,
+                    authorName: updatedSpot.authorName,
+                    authorEmail: updatedSpot.authorEmail,
+
                 }
             }
-            const result= await spotCollection.updateOne(filter,spot,options );
+            const result = await spotCollection.updateOne(filter, spot, options);
             res.send(result)
         })
+
+
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
